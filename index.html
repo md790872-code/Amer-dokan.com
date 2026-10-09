@@ -3,95 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>আমার দোকান - Online Product Manager</title>
+  <meta name="theme-color" content="#14532d">
+  <title>আমার দোকান — পণ্য ও স্টক</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    * { box-sizing: border-box; font-family: Arial, sans-serif; }
-    body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #f2f5f9; }
-    .box { width: 92%; max-width: 400px; background: white; padding: 30px; border-radius: 18px; box-shadow: 0 8px 30px rgba(0,0,0,.12); }
-    h1 { text-align: center; margin-bottom: 5px; }
-    .subtitle { text-align: center; color: #666; margin-bottom: 25px; }
-    .login-title { text-align: center; font-size: 22px; margin-bottom: 10px; }
-    input { width: 100%; padding: 13px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; }
-    button { width: 100%; padding: 13px; margin-top: 10px; border: 0; border-radius: 10px; background: #2563eb; color: white; font-size: 16px; cursor: pointer; }
-    button.secondary { background: #16a34a; }
-    .logout { background: #dc2626; }
-    #message { text-align: center; margin-top: 15px; color: #d00; }
-    #app { display: none; text-align: center; }
-  </style>
-</head>
-<body>
-  <div class="box" id="loginBox">
-    <h1>আমার দোকান</h1>
-    <div class="subtitle">Online Product Manager</div>
-    <div class="login-title">🔐 Login</div>
-    <p style="text-align:center;color:#666;">Supabase connect করার পর এখানে তোমার account দিয়ে login করবে।</p>
-    <input type="email" id="email" placeholder="Email" autocomplete="email">
-    <input type="password" id="password" placeholder="Password" autocomplete="current-password">
-    <button onclick="login()">Login</button>
-    <button class="secondary" onclick="createAccount()">Create account</button>
-    <div id="message"></div>
-  </div>
-  <div class="box" id="app">
-    <h1>🏪 আমার দোকান</h1>
-    <p>Online Product Manager</p>
-    <p id="userEmail"></p>
-    <hr>
-    <h2>📦 Product Manager</h2>
-    <p>Login সফল হয়েছে।</p>
-    <button class="logout" onclick="logout()">Logout</button>
-  </div>
-  <script>
-    const SUPABASE_URL = "https://lhjyxwaajwoyurrhwpkt.supabase.co";
-    const SUPABASE_KEY = prompt("Supabase Publishable Key দিন:");
-    if (!SUPABASE_KEY) {
-      alert("Supabase key না দিলে website কাজ করবে না।");
-    }
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    :root { color-scheme: light; --green:#166534; --blue:#2563eb; --red:#dc2626; }
+    * { box-sizing:border-box; font-family:Arial,sans-serif; }
+    body { margin:0; background:#f3f6f4; color:#17211b; }
+    .wrap { max-width:1000px; margin:auto; padding:16px; }
+    .panel { background:white; padding:20px; margin:14px 0; border-radius:16px; box-shadow:0 4px 18px #0000000c; }
+    h1,h2,h3 { margin-top:0; }
+    .muted { color:#647067; font-size:14px; }
+    label { display:block; font-size:14px; margin:12px 0 5px; }
+    input { width:100%; padding:12px; border:1px solid #ccd5ce; border-radius:9px; font-size:16px; }
+    button { border:0; border-radius:9px; padding:12px 14px; color:white; background:var(--blue); font-size:15px; cursor:pointer; }
+    button:disabled { opacity:.6; cursor:wait; }
+    .green { background:var(--green); } .red { background:var(--red); } .gray { background:#475569; }
+    .actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+    .actions button { flex:1; }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+    .stat { background:#f0fdf4; border:1px solid #dcfce7; border-radius:12px; padding:14px; }
+    .stat strong { display:block; font-size:20px; margin-top:6px; overflow-wrap:anywhere; }
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; min-width:650px; }
+    th,td { padding:11px 9px; border-bottom:1px solid #e5e7eb; text-align:left; font-size:14px; }
+    th { background:#f8fafc; }
+    .small-btn { padding:8px 10px; margin:2px; font-size:13px; }
+    #app { display:none; } #message { margin-top:12px; color:#b91c1c; overflow-wrap:anywhere; }
+    .positive { color:#166534; } .negative { color:#b91c1c; }
+    @media(max-width:600px) { .grid,.stats
 
-    async function login() {
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-      const message = document.getElementById("message");
-      message.innerText = "";
-      if (!email || !password) { message.innerText = "Email এবং Password দাও।"; return; }
-      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-      if (error) { message.innerText = "Login হয়নি: " + error.message; return; }
-      showApp(data.user);
-    }
-
-    async function createAccount() {
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-      const message = document.getElementById("message");
-      message.innerText = "";
-      if (!email || !password) { message.innerText = "Email এবং Password দাও।"; return; }
-      if (password.length < 6) { message.innerText = "Password কমপক্ষে ৬ অক্ষরের হতে হবে।"; return; }
-      const { error } = await supabaseClient.auth.signUp({ email, password });
-      if (error) { message.innerText = "Account তৈরি হয়নি: " + error.message; return; }
-      message.innerText = "Account তৈরি হয়েছে। Email verification লাগলে email check করো।";
-    }
-
-    function showApp(user) {
-      document.getElementById("loginBox").style.display = "none";
-      document.getElementById("app").style.display = "block";
-      document.getElementById("userEmail").innerText = "Logged in: " + user.email;
-    }
-
-    async function logout() {
-      await supabaseClient.auth.signOut();
-      document.getElementById("app").style.display = "none";
-      document.getElementById("loginBox").style.display = "block";
-      document.getElementById("email").value = "";
-      document.getElementById("password").value = "";
-      document.getElementById("message").innerText = "";
-    }
-
-    async function checkSession() {
-      const { data } = await supabaseClient.auth.getSession();
-      if (data.session) showApp(data.session.user);
-    }
-    checkSession();
-  </script>
-</body>
-</html>
